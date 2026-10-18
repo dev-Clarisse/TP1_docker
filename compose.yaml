@@ -1,0 +1,44 @@
+services:
+  db:
+    build:
+      context: ./db
+    environment:
+      POSTGRES_DB: db
+      POSTGRES_USER: usr
+      POSTGRES_PASSWORD: pwd
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U usr -d db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+
+  api:
+    build:
+      context: ./simpleapi/simpleapi
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/db
+      SPRING_DATASOURCE_USERNAME: usr
+      SPRING_DATASOURCE_PASSWORD: pwd
+    ports:
+      - "8080:8080"
+
+  httpd:
+    build:
+      context: ./simpleapi/simpleapi/httpd
+    ports:
+      - "80:80"
+    depends_on:
+      - api    
+
+volumes:
+  postgres-data:
+
+  
