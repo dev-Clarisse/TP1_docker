@@ -33,7 +33,7 @@ jobs:
         run: >
           mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar 
           -Dsonar.projectKey=projects-2880 
-          -Dsonar.organization=Projects_2880 
+          -Dsonar.organization=projects-2880 
           -Dsonar.host.url=https://sonarcloud.io 
           --file simpleapi/simpleapi/pom.xml
 
