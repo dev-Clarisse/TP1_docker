@@ -9,6 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -24,13 +26,13 @@ class DepartmentsServiceTest {
 
     private final Department DEPARTMENT = Department.builder()
             .id(1L)
-            .name("DepartementTest")
+            .name("DepartmentTest")
             .build();
 
     @Test
     void testGetDepartmentByName() {
         when(departmentDAO.findDepartmentByName("DepartmentTest")).thenReturn(DEPARTMENT);
-        assertEquals(DEPARTMENT, departmentDAO.findDepartmentByName("DepartmentTest"));
+        assertEquals(DEPARTMENT, departmentService.getDepartmentByName("DepartmentTest"));
     }
 
     @Test
@@ -41,5 +43,17 @@ class DepartmentsServiceTest {
     @Test
     void testGetDepartmentByNameWithEmptyValue() {
         assertThrows(IllegalArgumentException.class, () -> departmentService.getDepartmentByName(""));
+    }
+
+    @Test
+    void testGetDepartmentById() {
+        when(departmentDAO.findById(1L)).thenReturn(Optional.of(DEPARTMENT));
+        assertEquals(DEPARTMENT, departmentService.getDepartmentById(1L));
+    }
+
+    @Test
+    void testGetDepartmentByIdWithUnknownId() {
+        when(departmentDAO.findById(99L)).thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class, () -> departmentService.getDepartmentById(99L));
     }
 }

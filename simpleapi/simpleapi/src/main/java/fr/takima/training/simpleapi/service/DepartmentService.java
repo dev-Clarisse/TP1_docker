@@ -24,6 +24,11 @@ public class DepartmentService {
         return this.departmentDAO.findDepartmentByName(departmentName);
     }
 
+    public Department getDepartmentById(long id) {
+        return this.departmentDAO.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown department " + id));
+    }
+
     public List<Department> getDepartments() {
         return this.departmentDAO.findAll();
     }

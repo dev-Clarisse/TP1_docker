@@ -7,10 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @RestController
-// @CrossOrigin(origins = "http://localhost:4200") 
+// @CrossOrigin(origins = "http://localhost:4200")
 @CrossOrigin
 @RequestMapping(value = "/departments")
 public class DepartmentController {
@@ -29,32 +27,27 @@ public class DepartmentController {
     }
 
     @GetMapping("/{departmentName}/students")
-    public ResponseEntity<Object> getDepartmentList(@PathVariable(name="departmentName") String name) {
-        Optional<Department> optionalDepartment = Optional.ofNullable(this.departmentService.getDepartmentByName(name));
-        if (optionalDepartment.isEmpty()) {
+    public ResponseEntity<Object> getDepartmentList(@PathVariable(name = "departmentName") String name) {
+        if (this.departmentService.getDepartmentByName(name) == null) {
             return ResponseEntity.notFound().build();
         }
-
         return ResponseEntity.ok(this.studentService.getStudentsByDepartmentName(name));
     }
 
     @GetMapping("/{departmentName}")
-    public ResponseEntity<Object> getDepartmentByName(@PathVariable(name="departmentName") String name) {
-        Optional<Department> optionalDepartment = Optional.ofNullable(this.departmentService.getDepartmentByName(name));
-        if (optionalDepartment.isEmpty()) {
+    public ResponseEntity<Object> getDepartmentByName(@PathVariable(name = "departmentName") String name) {
+        Department department = this.departmentService.getDepartmentByName(name);
+        if (department == null) {
             return ResponseEntity.notFound().build();
         }
-
-        return ResponseEntity.ok(this.departmentService.getDepartmentByName(name));
+        return ResponseEntity.ok(department);
     }
 
     @GetMapping("/{departmentName}/count")
-    public ResponseEntity<Object> getDepartmentCountByName(@PathVariable(name="departmentName") String name) {
-        Optional<Department> optionalDepartment = Optional.ofNullable(this.departmentService.getDepartmentByName(name));
-        if (optionalDepartment.isEmpty()) {
+    public ResponseEntity<Object> getDepartmentCountByName(@PathVariable(name = "departmentName") String name) {
+        if (this.departmentService.getDepartmentByName(name) == null) {
             return ResponseEntity.notFound().build();
         }
-
         return ResponseEntity.ok(this.studentService.getStudentsNumberByDepartmentName(name));
     }
 }

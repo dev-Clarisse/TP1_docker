@@ -46,10 +46,7 @@ class StudentControllerTestIT {
                 {
                     "firstname": "Didier",
                     "lastname": "Deschamps",
-                    "department": {
-                        "id": 4,
-                        "name": "GC"
-                    }
+                    "departmentId": 4
                 }
                 """;
         mockMvc.perform(post("/students")
@@ -65,10 +62,7 @@ class StudentControllerTestIT {
         String body = """
                 {
                     "firstname": "Didier",
-                    "department": {
-                        "id": 4,
-                        "name": "GC"
-                    }
+                    "departmentId": 4
                 }
                 """;
         mockMvc.perform(post("/students")
@@ -82,8 +76,24 @@ class StudentControllerTestIT {
     void testPostStudentWithoutDepartment() throws Exception {
         String body = """
                 {
-                    "lastname": "Didier",
-                    }
+                    "firstname": "Didier",
+                    "lastname": "Deschamps"
+                }
+                """;
+        mockMvc.perform(post("/students")
+                        .content(body)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Sql({"/InsertData.sql"})
+    void testPostStudentWithUnknownDepartment() throws Exception {
+        String body = """
+                {
+                    "firstname": "Didier",
+                    "lastname": "Deschamps",
+                    "departmentId": 9999
                 }
                 """;
         mockMvc.perform(post("/students")
@@ -106,10 +116,7 @@ class StudentControllerTestIT {
                 {
                     "firstname": "Francis",
                     "lastname": "Huster",
-                    "department": {
-                        "id": 1,
-                        "name": "ASI"
-                    }
+                    "departmentId": 1
                 }
                 """;
         mockMvc.perform(put("/students/11")
