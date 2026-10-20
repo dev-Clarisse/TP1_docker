@@ -12,8 +12,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
 @RestController
-@CrossOrigin
-// @CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping(value = "/students")
 public class StudentController {
     private final StudentService studentService;
