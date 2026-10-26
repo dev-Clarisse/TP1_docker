@@ -1,4 +1,4 @@
-package fr.takima.training.simpleapi.controller;
+package fr.takima.training.simpleapi.Controller.StudentController;
 
 import fr.takima.training.simpleapi.dto.StudentDto;
 import fr.takima.training.simpleapi.entity.Student;

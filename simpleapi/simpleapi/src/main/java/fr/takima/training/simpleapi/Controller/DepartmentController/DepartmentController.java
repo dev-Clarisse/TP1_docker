@@ -1,4 +1,4 @@
-package fr.takima.training.simpleapi.controller;
+package fr.takima.training.simpleapi.Controller.DepartmentController;
 
 import fr.takima.training.simpleapi.entity.Department;
 import fr.takima.training.simpleapi.service.DepartmentService;

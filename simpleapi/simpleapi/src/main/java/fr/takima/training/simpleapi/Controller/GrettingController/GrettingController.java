@@ -1,4 +1,4 @@
-package fr.takima.training.simpleapi;
+package fr.takima.training.simpleapi.Controller.GrettingController;
 
 import org.springframework.web.bind.annotation.*;
 

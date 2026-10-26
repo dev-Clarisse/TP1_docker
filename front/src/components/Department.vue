@@ -77,6 +77,8 @@ export default {
         body: JSON.stringify({
           firstname: this.firstname,
           lastname: this.lastname,
+          // the API's StudentDto expects a flat "departmentId" field
+          departmentId: this.currentDepartment.id,
           department: {
             id: this.currentDepartment.id,
             name: this.currentDepartment.name
