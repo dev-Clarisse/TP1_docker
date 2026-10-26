@@ -87,22 +87,30 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Ansible
-        run: pipx install --include-deps ansible
+      # Ansible runs inside a Docker image instead of being installed on the runner
+      - name: Build Ansible image
+        run: docker build -t ansible-runner ./ansible
 
-      - name: Set up SSH key
+      - name: Write SSH key and Vault password
         run: |
-          mkdir -p ~/.ssh
+          mkdir -p secrets
           # tr removes Windows line endings (\r), which make the key unreadable
-          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          # fails here with a clear message if the key is malformed
-          ssh-keygen -y -f ~/.ssh/id_rsa > /dev/null && echo "SSH key OK"
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > secrets/id_rsa
+          chmod 600 secrets/id_rsa
+          ssh-keygen -y -f secrets/id_rsa > /dev/null && echo "SSH key OK"
+          printf '%s' "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > secrets/vault_pass
 
-      - name: Deploy with Ansible
-        env:
-          ANSIBLE_HOST_KEY_CHECKING: "False"
+      - name: Deploy with Ansible (in Docker)
         run: >
-          ansible-playbook -i ansible/inventories/setup.yml ansible/playbook.yml
-          -e ansible_ssh_private_key_file=$HOME/.ssh/id_rsa
+          docker run --rm
+          -v "$PWD/ansible:/ansible"
+          -v "$PWD/secrets:/secrets:ro"
+          ansible-runner
+          -i inventories/setup.yml playbook.yml
+          --vault-password-file /secrets/vault_pass
+          -e ansible_ssh_private_key_file=/secrets/id_rsa
           -e dockerhub_user=${{ secrets.DOCKERHUB_USERNAME }}
+
+      - name: Remove secrets
+        if: always()
+        run: rm -rf secrets

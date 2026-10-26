@@ -2,12 +2,14 @@
   gather_facts: true
   become: true
 
+  # db_user and db_password are encrypted with Ansible Vault
+  vars_files:
+    - vars/vault.yml
+
   vars:
     dockerhub_user: cladev28   
     docker_network: app-network
     db_name: db
-    db_user: usr
-    db_password: pwd
     # The docker_* modules need the Docker SDK, installed in this venv by the docker role
     docker_python: /opt/docker_venv/bin/python
 

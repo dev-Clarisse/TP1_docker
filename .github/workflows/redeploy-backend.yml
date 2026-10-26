@@ -1,0 +1,30 @@
+# Lightweight alternative to Ansible: SSH to the server and only relaunch the API.
+# Triggered manually from the "Actions" tab ("Run workflow").
+name: Redeploy backend only
+
+on:
+  workflow_dispatch:
+
+jobs:
+  redeploy-api:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Write SSH key
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Pull latest API image and restart the container
+        env:
+          IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api:latest
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa admin@clarisse.delcastillo.takima.school "
+            set -e
+            sudo docker pull $IMAGE
+            # reuse the DB settings (SPRING_DATASOURCE_*) of the running container
+            ENV_ARGS=\$(sudo docker inspect api --format '{{range .Config.Env}}{{println .}}{{end}}' | grep '^SPRING_DATASOURCE_' | sed 's/^/-e /' | tr '\\n' ' ')
+            sudo docker rm -f api
+            sudo docker run -d --name api --network app-network --restart unless-stopped \$ENV_ARGS $IMAGE
+            sudo docker ps --filter name=api
+          "
