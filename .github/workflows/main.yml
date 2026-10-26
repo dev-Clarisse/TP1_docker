@@ -93,8 +93,11 @@ jobs:
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          # tr removes Windows line endings (\r), which make the key unreadable
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          # fails here with a clear message if the key is malformed
+          ssh-keygen -y -f ~/.ssh/id_rsa > /dev/null && echo "SSH key OK"
 
       - name: Deploy with Ansible
         env:
