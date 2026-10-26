@@ -1,0 +1,10 @@
+---
+- name: Run front-end
+  community.docker.docker_container:
+    name: front                   # httpd proxies "/" to "front:80"
+    image: "{{ dockerhub_user }}/tp-devops-front:latest"
+    pull: always
+    state: started
+    restart_policy: unless-stopped
+    networks:
+      - name: "{{ docker_network }}"

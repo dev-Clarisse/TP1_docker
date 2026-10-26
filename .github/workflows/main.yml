@@ -70,3 +70,36 @@ jobs:
           context: ./simpleapi/simpleapi/httpd
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
+
+      - name: Build image and push front
+        uses: docker/build-push-action@v6
+        with:
+          context: ./front
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-front:latest
+
+  deploy:
+    needs: build-and-push-docker-image
+    # deploy only from main, not from develop or pull requests
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Ansible
+        run: pipx install --include-deps ansible
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Deploy with Ansible
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "False"
+        run: >
+          ansible-playbook -i ansible/inventories/setup.yml ansible/playbook.yml
+          -e ansible_ssh_private_key_file=$HOME/.ssh/id_rsa
+          -e dockerhub_user=${{ secrets.DOCKERHUB_USERNAME }}

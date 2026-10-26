@@ -1,0 +1,16 @@
+---
+- name: Run PostgreSQL database
+  community.docker.docker_container:
+    name: db                      # the API connects to "db:5432"
+    image: "{{ dockerhub_user }}/tp-devops-db:latest"
+    pull: always
+    state: started
+    restart_policy: unless-stopped
+    env:
+      POSTGRES_DB: "{{ db_name }}"
+      POSTGRES_USER: "{{ db_user }}"
+      POSTGRES_PASSWORD: "{{ db_password }}"
+    volumes:
+      - db-data:/var/lib/postgresql/data   # keeps the data if the container is recreated
+    networks:
+      - name: "{{ docker_network }}"

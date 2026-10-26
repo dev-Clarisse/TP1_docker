@@ -1,0 +1,6 @@
+---
+# Private network shared by the three containers, so they can reach each other by name
+- name: Create Docker network
+  community.docker.docker_network:
+    name: "{{ docker_network }}"
+    state: present

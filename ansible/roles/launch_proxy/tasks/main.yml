@@ -1,0 +1,12 @@
+---
+- name: Run HTTPD reverse proxy
+  community.docker.docker_container:
+    name: httpd
+    image: "{{ dockerhub_user }}/tp-devops-httpd:latest"
+    pull: always
+    state: started
+    restart_policy: unless-stopped
+    ports:
+      - "80:80"                   # only the proxy is exposed to the internet
+    networks:
+      - name: "{{ docker_network }}"

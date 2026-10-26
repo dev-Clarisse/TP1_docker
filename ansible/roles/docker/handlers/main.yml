@@ -1,0 +1,9 @@
+---
+# Restart Docker only when a task notifies this handler
+- name: Restart Docker
+  service:
+    name: docker
+    state: restarted
+
+
+

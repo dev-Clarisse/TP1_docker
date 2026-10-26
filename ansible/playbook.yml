@@ -1,0 +1,30 @@
+- hosts: all
+  gather_facts: true
+  become: true
+
+  vars:
+    dockerhub_user: cladev28   
+    docker_network: app-network
+    db_name: db
+    db_user: usr
+    db_password: pwd
+    # The docker_* modules need the Docker SDK, installed in this venv by the docker role
+    docker_python: /opt/docker_venv/bin/python
+
+  roles:
+    - docker
+    - role: create_network
+      vars:
+        ansible_python_interpreter: "{{ docker_python }}"
+    - role: launch_database
+      vars:
+        ansible_python_interpreter: "{{ docker_python }}"
+    - role: launch_app
+      vars:
+        ansible_python_interpreter: "{{ docker_python }}"
+    - role: launch_front
+      vars:
+        ansible_python_interpreter: "{{ docker_python }}"
+    - role: launch_proxy
+      vars:
+        ansible_python_interpreter: "{{ docker_python }}"
